@@ -81,7 +81,7 @@ button.logout { background: #7f8c8d; padding: 10px; font-size: 12px; min-width: 
 }
 .error { background: #ffebee; color: #c62828; padding: 20px; margin-top: 20px; border-radius: 12px; text-align: center; }
 .footer { font-size: 13px; color: #7f8c8d; text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #ecf0f1; }
-.author-link { color: #e74c3c; text-decoration: none; font-weight: 600; }
+.author-link { color: #7f8c8d; text-decoration: none; font-weight: 600; }
 @media (max-width: 480px) {
     .container { padding: 20px 15px; }
     input { padding: 18px; font-size: 20px; }
@@ -155,7 +155,7 @@ def index():
 
 <div class="footer">
     250 патронов (🟢Т>🔴БР>⚪️ЛПС) | 
-    <a href="https://t.me/wtfneponn" class="author-link" target="_blank">💚 Автор (заслон 5)</a>
+    <a href="https://t.me/wtfneponn" class="author-link" target="_blank">Автор (заслон 5)</a>
 </div>
 
 <form action="/logout" method="POST">
