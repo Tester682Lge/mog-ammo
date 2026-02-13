@@ -29,7 +29,6 @@ class AmmoCalculator:
         next_type = self.get_ammo_type(next_pos) if remaining > 0 else "-"
         t_used, br_used, lps_used = self.count_ammo_by_position(total_used)
         
-        # ✅ ИСПРАВЛЕНО: f"{число:3d}" вместо {число:3d}
         return f"""Отрезок: {segment:2d}
 Осталось: {remaining:2d}
 В отрезке: {used_in_segment:2d}
@@ -69,7 +68,7 @@ button { background: #4CAF50; color: white; padding: 12px 24px; border: none; bo
 button:hover { background: #45a049; }
 button.reset { background: #f44336; }
 button.reset:hover { background: #da190b; }
-button.author { background: #ff6b6b; padding: 8px 16px; font-size: 14px; }
+button.author { background: #ffffff padding: 8px 16px; font-size: 14px; }
 button.author:hover { background: #ff5252; }
 .result { background: #e8f5e8; padding: 20px; margin-top: 20px; border-radius: 5px; font-family: 'Consolas', monospace; white-space: pre; border-left: 4px solid #4CAF50; }
 .error { background: #ffebee; color: #c62828; padding: 15px; margin-top: 20px; border-radius: 5px; border-left: 4px solid #f44336; }
@@ -83,13 +82,13 @@ button.author:hover { background: #ff5252; }
     <div style="text-align: center;">
     Отрезок (1-10): <input name="segment" type="number" min="1" max="10" value="{{ request.form.segment if request.form else '' }}" required><br><br>
     Осталось (0-25): <input name="remaining" type="number" min="0" max="25" value="{{ request.form.remaining if request.form else '' }}" required><br><br>
-    <button type="submit">🧮 РАСЧИТАТЬ</button>
+    <button type="submit">🔢 РАСЧИТАТЬ</button>
     <button type="reset" class="reset">🔄 СБРОСИТЬ</button>
     </div>
 </form>
 
 <div class="buttons">
-    <a href="https://t.me/wtfneponn"><button class="author">💚 Автор (заслон 5)</button></a>
+    <a href="https://t.me/wtfneponn"><button class="author"> Автор (заслон 5)</button></a>
 </div>
 
 {% if error %}
