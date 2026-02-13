@@ -57,39 +57,160 @@ def index():
     
     html = '''
 <!DOCTYPE html>
-<html><head><meta charset="utf-8">
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Калькулятор ленты ПКТ для МОГ</title>
 <style>
-body { font-family: Arial; max-width: 400px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
-.container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-h2 { color: #333; text-align: center; margin-bottom: 30px; }
-input { width: 80px; text-align: center; padding: 10px; margin: 10px 5px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px; }
-button { background: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 10px 5px; }
-button:hover { background: #45a049; }
-button.reset { background: #f44336; }
-button.reset:hover { background: #da190b; }
-button.author { background: #ffffff padding: 8px 16px; font-size: 14px; }
-button.author:hover { background: #ff5252; }
-.result { background: #e8f5e8; padding: 20px; margin-top: 20px; border-radius: 5px; font-family: 'Consolas', monospace; white-space: pre; border-left: 4px solid #4CAF50; }
-.error { background: #ffebee; color: #c62828; padding: 15px; margin-top: 20px; border-radius: 5px; border-left: 4px solid #f44336; }
-.info { font-size: 12px; color: #666; text-align: center; margin-top: 20px; }
-.buttons { text-align: center; margin-top: 15px; }
-</style></head>
+* { box-sizing: border-box; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+    margin: 0; padding: 10px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+.container { 
+    background: white; 
+    padding: 25px; 
+    border-radius: 20px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    max-width: 100%; 
+    margin: 0 auto;
+}
+h2 { 
+    color: #2c3e50; 
+    text-align: center; 
+    margin: 0 0 30px 0; 
+    font-size: 24px;
+    font-weight: 700;
+}
+.input-row {
+    display: flex; 
+    flex-direction: column; 
+    gap: 20px; 
+    margin-bottom: 25px;
+}
+.label-input {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: 8px;
+}
+input { 
+    width: 100%; 
+    max-width: 120px;
+    text-align: center; 
+    padding: 15px; 
+    border: 2px solid #e1e5e9; 
+    border-radius: 12px; 
+    font-size: 18px; 
+    background: #f8f9fa;
+    transition: all 0.2s;
+}
+input:focus { 
+    outline: none; 
+    border-color: #4CAF50; 
+    box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+}
+.buttons-row {
+    display: flex; 
+    gap: 15px; 
+    justify-content: center; 
+    flex-wrap: wrap;
+}
+button { 
+    background: linear-gradient(145deg, #4CAF50, #45a049); 
+    color: white; 
+    padding: 15px 30px; 
+    border: none; 
+    border-radius: 12px; 
+    font-size: 16px; 
+    font-weight: 600;
+    cursor: pointer; 
+    transition: all 0.2s;
+    min-width: 140px;
+    box-shadow: 0 4px 15px rgba(76,175,80,0.3);
+}
+button:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 20px rgba(76,175,80,0.4);
+}
+button:active { transform: translateY(0); }
+button.reset { 
+    background: linear-gradient(145deg, #f44336, #da190b); 
+    box-shadow: 0 4px 15px rgba(244,67,54,0.3);
+}
+button.reset:hover { 
+    box-shadow: 0 6px 20px rgba(244,67,54,0.4); 
+}
+.result { 
+    background: linear-gradient(145deg, #e8f5e8, #c8e6c9); 
+    padding: 25px; 
+    margin-top: 25px; 
+    border-radius: 15px; 
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace; 
+    white-space: pre; 
+    border-left: 5px solid #4CAF50;
+    font-size: 15px;
+    line-height: 1.6;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+}
+.error { 
+    background: linear-gradient(145deg, #ffebee, #ffcdd2); 
+    color: #c62828; 
+    padding: 20px; 
+    margin-top: 20px; 
+    border-radius: 12px; 
+    border-left: 5px solid #f44336;
+    text-align: center;
+    font-weight: 500;
+}
+.footer { 
+    font-size: 13px; 
+    color: #7f8c8d; 
+    text-align: center; 
+    margin-top: 25px; 
+    padding-top: 20px; 
+    border-top: 1px solid #ecf0f1;
+}
+.author-link {
+    color: #e74c3c;
+    text-decoration: none;
+    font-weight: 600;
+}
+.author-link:hover {
+    text-decoration: underline;
+}
+@media (max-width: 480px) {
+    body { padding: 5px; }
+    .container { padding: 20px 15px; margin: 5px; border-radius: 15px; }
+    h2 { font-size: 20px; margin-bottom: 25px; }
+    input { padding: 18px; font-size: 20px; max-width: 140px; }
+    button { padding: 18px 25px; font-size: 17px; min-width: 130px; }
+    .result { padding: 20px; font-size: 16px; }
+}
+</style>
+</head>
 <body>
 <div class="container">
 <h2>🔫 Расчёт ленты ПКТ для МОГ</h2>
+
 <form method="POST">
-    <div style="text-align: center;">
-    Отрезок (1-10): <input name="segment" type="number" min="1" max="10" value="{{ request.form.segment if request.form else '' }}" required><br><br>
-    Осталось (0-25): <input name="remaining" type="number" min="0" max="25" value="{{ request.form.remaining if request.form else '' }}" required><br><br>
-    <button type="submit">🔢 РАСЧИТАТЬ</button>
-    <button type="reset" class="reset">🔄 СБРОСИТЬ</button>
+    <div class="input-row">
+        <div class="label-input">
+            <label>Отрезок (1-10)</label>
+            <input name="segment" type="number" min="1" max="10" value="{{ request.form.segment if request.form else '' }}" required>
+        </div>
+        <div class="label-input">
+            <label>Осталось (0-25)</label>
+            <input name="remaining" type="number" min="0" max="25" value="{{ request.form.remaining if request.form else '' }}" required>
+        </div>
+    </div>
+    
+    <div class="buttons-row">
+        <button type="submit">🔢 РАСЧИТАТЬ</button>
+        <button type="reset" class="reset">🔄 СБРОСИТЬ</button>
     </div>
 </form>
-
-<div class="buttons">
-    <a href="https://t.me/wtfneponn"><button class="author"> Автор (заслон 5)</button></a>
-</div>
 
 {% if error %}
 <div class="error">{{ error }}</div>
@@ -99,9 +220,13 @@ button.author:hover { background: #ff5252; }
 <div class="result">{{ result }}</div>
 {% endif %}
 
-<div class="info">250 патронов (🟢Т>🔴БР>⚪️ЛПС)</div>
+<div class="footer">
+    250 патронов (🟢Т>🔴БР>⚪️ЛПС) | 
+    <a href="https://t.me/wtfneponn" class="author-link" target="_blank">💚 Автор (заслон 5)</a>
 </div>
-</body></html>
+</div>
+</body>
+</html>
     '''
     return render_template_string(html, result=result, error=error)
 
