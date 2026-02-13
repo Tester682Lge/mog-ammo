@@ -1,11 +1,16 @@
 from flask import Flask, request, render_template_string, session, redirect, url_for
 import os
 import secrets
+from datetime import timedelta
 
 app = Flask(__name__)
 
-# --- БЕЗОПАСНОСТЬ ---
+# --- БЕЗОПАСНОСТЬ И СЕССИЯ ---
+# ВАЖНО: Если ты хочешь, чтобы сессия НЕ слетала при обновлении кода на Railway,
+# ОБЯЗАТЕЛЬНО задай переменную SECRET_KEY в настройках Railway!
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(24))
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650) # "Навсегда" (10 лет)
+
 raw_passwords = os.environ.get('ALLOWED_PASSWORDS')
 ALLOWED_PASSWORDS = [p.strip() for p in raw_passwords.split(',')] if raw_passwords else []
 
@@ -46,8 +51,6 @@ class AmmoCalculator:
 
 calc = AmmoCalculator()
 
-# --- СТИЛИ И ФОРМЫ ---
-# CSS оставлен без изменений, как в твоем исходнике
 STYLE = '''
 <style>
 * { box-sizing: border-box; }
@@ -74,14 +77,14 @@ button {
     border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; min-width: 140px;
 }
 button.reset { background: linear-gradient(145deg, #f44336, #da190b); }
-button.logout { background: #7f8c8d; padding: 10px; font-size: 12px; min-width: 100px; margin-top: 20px; width: 100%; }
+button.logout { background: #7f8c8d; padding: 10px; font-size: 11px; min-width: 80px; margin-top: 25px; width: 100%; border-radius: 8px; opacity: 0.7; }
 .result { 
     background: linear-gradient(145deg, #e8f5e8, #c8e6c9); padding: 25px; margin-top: 25px; 
     border-radius: 15px; font-family: monospace; white-space: pre; border-left: 5px solid #4CAF50;
 }
-.error { background: #ffebee; color: #c62828; padding: 20px; margin-top: 20px; border-radius: 12px; text-align: center; }
+.error { background: #ffebee; color: #c62828; padding: 15px; margin-top: 20px; border-radius: 12px; text-align: center; }
 .footer { font-size: 13px; color: #7f8c8d; text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #ecf0f1; }
-.author-link { color: #7f8c8d; text-decoration: none; font-weight: 600; }
+.author-link { color: #e74c3c; text-decoration: none; font-weight: 600; }
 @media (max-width: 480px) {
     .container { padding: 20px 15px; }
     input { padding: 18px; font-size: 20px; }
@@ -92,11 +95,11 @@ button.logout { background: #7f8c8d; padding: 10px; font-size: 12px; min-width: 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # 1. Экран авторизации
     if 'auth' not in session:
         error_msg = ""
         if request.method == 'POST':
             if request.form.get('pwd') in ALLOWED_PASSWORDS:
+                session.permanent = True # Сессия будет жить долго
                 session['auth'] = True
                 return redirect(url_for('index'))
             else:
@@ -106,7 +109,7 @@ def index():
             <!DOCTYPE html><html><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             {STYLE}</head><body><div class="container">
-                <h2>🔐 Доступ</h2>
+                <h2>🔐 Вход</h2>
                 <form method="POST">
                     <input type="password" name="pwd" placeholder="Пароль" required autofocus style="max-width:100%">
                     <button type="submit" style="width:100%; margin-top:10px">ВОЙТИ</button>
@@ -115,7 +118,6 @@ def index():
             </div></body></html>
         ''')
 
-    # 2. Твой оригинальный калькулятор
     result = ""
     error = ""
     if request.method == 'POST' and 'segment' in request.form:
@@ -129,7 +131,7 @@ def index():
     return render_template_string(f'''
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Калькулятор ленты ПКТ для МОГ</title>
+<title>Калькулятор ленты ПКТ</title>
 {STYLE}</head><body>
 <div class="container">
 <h2>🔫 Расчёт ленты ПКТ для МОГ</h2>
@@ -155,11 +157,11 @@ def index():
 
 <div class="footer">
     250 патронов (🟢Т>🔴БР>⚪️ЛПС) | 
-    <a href="https://t.me/wtfneponn" class="author-link" target="_blank">Автор (заслон 5)</a>
+    <a href="https://t.me/wtfneponn" class="author-link" target="_blank">💚 Автор (заслон 5)</a>
 </div>
 
 <form action="/logout" method="POST">
-    <button type="submit" class="logout">🚪 ВЫЙТИ</button>
+    <button type="submit" class="logout">🚪 ВЫЙТИ ИЗ АККАУНТА</button>
 </form>
 </div>
 </body></html>
