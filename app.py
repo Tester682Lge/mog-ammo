@@ -6,10 +6,8 @@ from datetime import timedelta
 app = Flask(__name__)
 
 # --- БЕЗОПАСНОСТЬ И СЕССИЯ ---
-# ВАЖНО: Если ты хочешь, чтобы сессия НЕ слетала при обновлении кода на Railway,
-# ОБЯЗАТЕЛЬНО задай переменную SECRET_KEY в настройках Railway!
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(24))
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650) # "Навсегда" (10 лет)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=3650) 
 
 raw_passwords = os.environ.get('ALLOWED_PASSWORDS')
 ALLOWED_PASSWORDS = [p.strip() for p in raw_passwords.split(',')] if raw_passwords else []
@@ -27,24 +25,27 @@ class AmmoCalculator:
         lps = total_used // 3
         return t, br, lps
 
-    def calculate(self, segment, remaining):
+    def calculate(self, segment, spent):
         if not (1 <= segment <= 10): return "Ошибка: Отрезок 1-10"
-        if not (0 <= remaining <= 25): return "Ошибка: Патроны 0-25"
+        if not (0 <= spent <= 25): return "Ошибка: Патроны 0-25"
         
-        used_in_segment = 25 - remaining
+        # ЛОГИКА ИЗМЕНЕНА: используем 'spent' напрямую как количество потраченных патронов
+        used_in_segment = spent
         total_used = (segment - 1) * 25 + used_in_segment
+        
         last_fired = self.get_ammo_type(total_used) if total_used > 0 else "-"
         next_pos = total_used + 1
-        next_type = self.get_ammo_type(next_pos) if remaining > 0 else "-"
+        # Следующий патрон отображается, если в текущем отрезке еще есть место (меньше 25 потрачено)
+        next_type = self.get_ammo_type(next_pos) if used_in_segment < 25 else "-"
+        
         t_used, br_used, lps_used = self.count_ammo_by_position(total_used)
         
         return f"""Отрезок: {segment:2d}
-Осталось: {remaining:2d}
-В отрезке: {used_in_segment:2d}
-Всего: {total_used:3d}/250
-Ленте осталось: {250-total_used:3d}
-Последний: {last_fired}
-Следующий: {next_type}
+Потрачено в сегменте: {used_in_segment:2d}
+Всего потрачено: {total_used:3d}/250
+В ленте осталось: {250-total_used:3d}
+Последний ушедший: {last_fired}
+Следующий в очереди: {next_type}
 🟢Т: {t_used:3d}
 🔴БР: {br_used:3d}
 ⚪️ЛПС: {lps_used:3d}"""
@@ -99,7 +100,7 @@ def index():
         error_msg = ""
         if request.method == 'POST':
             if request.form.get('pwd') in ALLOWED_PASSWORDS:
-                session.permanent = True # Сессия будет жить долго
+                session.permanent = True
                 session['auth'] = True
                 return redirect(url_for('index'))
             else:
@@ -122,7 +123,7 @@ def index():
     error = ""
     if request.method == 'POST' and 'segment' in request.form:
         try:
-            res_text = calc.calculate(int(request.form['segment']), int(request.form['remaining']))
+            res_text = calc.calculate(int(request.form['segment']), int(request.form['spent']))
             if "Ошибка" in res_text: error = res_text
             else: result = res_text
         except:
@@ -142,8 +143,8 @@ def index():
             <input name="segment" type="number" min="1" max="10" value="{request.form.get('segment','')}" required>
         </div>
         <div class="label-input">
-            <label>Осталось (0-25)</label>
-            <input name="remaining" type="number" min="0" max="25" value="{request.form.get('remaining','')}" required>
+            <label>Потрачено (0-25)</label>
+            <input name="spent" type="number" min="0" max="25" value="{request.form.get('spent','')}" required>
         </div>
     </div>
     <div class="buttons-row">
